@@ -140,70 +140,7 @@ def example_math_with_tools():
     print_result("Example 1 - Math + Tool Use (Deep Agent)", result)
 
 
-# ---------------------------------------------------------------------------
-# Example 2: Character counting with tool use
-# ---------------------------------------------------------------------------
-def example_character_counting():
-    """Agent uses the count_characters tool alongside reasoning."""
-    agent = create_deep_agent(
-        model=llm,
-        tools=[count_characters],
-        system_prompt=(
-            "You are a helpful assistant. When asked to count characters in "
-            "a word, use the 'count_characters' tool to get an accurate count."
-        ),
-    )
-
-    result = agent.invoke(
-        {
-            "messages": [
-                {
-                    "role": "user",
-                    "content": (
-                        "How many r's are in the word 'strawberry'? "
-                        "Use the count_characters tool to verify."
-                    ),
-                }
-            ]
-        }
-    )
-    print_result("Example 2 - Character Counting (Deep Agent)", result)
-
-
-# ---------------------------------------------------------------------------
-# Example 3: Multi-step reasoning without custom tools
-# ---------------------------------------------------------------------------
-def example_pure_reasoning():
-    """Agent uses only built-in planning + reasoning (no custom tools)."""
-    agent = create_deep_agent(
-        model=llm,
-        tools=[],
-        system_prompt=(
-            "You are a senior software engineer. Think carefully and plan "
-            "your approach before answering."
-        ),
-    )
-
-    result = agent.invoke(
-        {
-            "messages": [
-                {
-                    "role": "user",
-                    "content": (
-                        "Write a Python function that determines if a given string "
-                        "of parentheses, brackets, and braces is balanced. "
-                        "Explain your approach first, then provide the code."
-                    ),
-                }
-            ]
-        }
-    )
-    print_result("Example 3 - Pure Reasoning (Deep Agent)", result)
-
-
-# ---------------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     print("Azure AI Foundry - GPT-5.2-chat Reasoning Examples (Deep Agent)")
     print("=" * 60)
