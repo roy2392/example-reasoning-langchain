@@ -1,12 +1,13 @@
 # Azure AI Foundry - GPT-5.2 Reasoning Examples
 
-Python examples demonstrating GPT-5.2 reasoning capabilities via Azure AI Foundry, using both the raw OpenAI SDK and LangChain.
+Python examples demonstrating GPT-5.2 reasoning capabilities via Azure AI Foundry, using the raw OpenAI SDK, LangChain, and LangChain Deep Agents.
 
 ## Features demonstrated
 
 - **Reasoning effort** (`medium`) - controls how long the model "thinks" before answering
 - **Reasoning summary** (`auto`, `detailed`) - surfaces the model's chain-of-thought as a summary
 - **Token usage breakdown** - shows `reasoning_tokens` vs regular output tokens
+- **Agentic reasoning** - reasoning inside a Deep Agent with tool calling and planning
 
 ## Prerequisites
 
@@ -64,6 +65,20 @@ Runs three examples using LangChain's `ChatOpenAI` with the Responses API:
 | 2 | Coding puzzle (balanced brackets) | `medium` |
 | 3 | Strawberry question with full metadata dump | `medium` |
 
+### Deep Agent example
+
+```bash
+python deepagent_example.py
+```
+
+Runs three examples using LangChain's `create_deep_agent` with reasoning + tool calling:
+
+| # | Description | Reasoning effort |
+|---|-------------|-----------------|
+| 1 | Math problem with `calculate` tool | `medium` |
+| 2 | Character counting with `count_characters` tool | `medium` |
+| 3 | Coding puzzle (pure reasoning, no custom tools) | `medium` |
+
 ## Key API patterns
 
 ### OpenAI SDK - Responses API with reasoning
@@ -101,6 +116,35 @@ llm = ChatOpenAI(
 response = llm.invoke([HumanMessage(content="your prompt")])
 ```
 
+### Deep Agent - create_deep_agent with reasoning + tools
+
+```python
+from deepagents import create_deep_agent
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(
+    model="gpt-5.2-chat",
+    api_key="your-key",
+    base_url="https://<resource>.services.ai.azure.com/openai/v1/",
+    reasoning={"effort": "medium", "summary": "auto"},
+)
+
+def calculate(expression: str) -> str:
+    """Evaluate a math expression."""
+    return str(eval(expression))
+
+agent = create_deep_agent(
+    model=llm,
+    tools=[calculate],
+    system_prompt="You are a helpful math tutor.",
+)
+
+result = agent.invoke(
+    {"messages": [{"role": "user", "content": "What is 320 / (80 + 120)?"}]}
+)
+print(result["messages"][-1].content)
+```
+
 ### Reading reasoning tokens from usage
 
 ```python
@@ -126,4 +170,5 @@ reasoning_tokens = usage["completion_tokens_details"]["reasoning_tokens"]
 - [Azure OpenAI reasoning models](https://learn.microsoft.com/azure/ai-foundry/openai/how-to/reasoning?view=foundry-classic)
 - [Responses API](https://learn.microsoft.com/azure/ai-foundry/openai/how-to/responses?view=foundry-classic)
 - [LangChain ChatOpenAI with reasoning](https://docs.langchain.com/oss/python/integrations/chat/openai#using-with-azure-openai)
+- [LangChain Deep Agents](https://docs.langchain.com/oss/python/deepagents/overview)
 - [GPT-5 prompting cookbook](https://cookbook.openai.com/examples/gpt-5/gpt-5_prompting_guide)
